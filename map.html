@@ -1,0 +1,851 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Map</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+<meta name="author" content="Carlos Alvarez - Alvarez.is">
+
+<link rel="stylesheet"
+	href="http://netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.css">
+<link rel="stylesheet"
+	href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<link rel="stylesheet"
+	href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css"
+	integrity="sha512-07I2e+7D8p6he1SIM+1twR5TIrhUQn9+I6yjqD53JQjFiMf8EtC93ty0/5vJTZGF8aAocvHYNEDJajGdNx1IsQ=="
+	crossorigin="" />
+<script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"
+	integrity="sha512-A7vV8IFfih/D732iSSKi20u/ooOfj/AGehOKq0f4vLT1Zr2Y+RX7C+w8A1gaSasGtRUZpF/NZgzSAu4/Gc41Lg=="
+	crossorigin=""></script>
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
+<script src="http://malsup.github.io/jquery.blockUI.js"></script>
+<style>
+.ui-autocomplete {
+	position: absolute;
+	z-index: 999999;
+	top: 0;
+	left: 0;
+	cursor: default;
+	max-height: 350px;
+	overflow-y: scroll;
+	overflow-x: hidden;
+}
+
+#search {
+	width: 100%;
+	margin: 4px;
+	height: 50%;
+}
+
+#proName {
+	font-family: Montserrat, sans-serif;
+	color: white;
+	margin-top: 15px;
+	background: black;
+	height: 50%;
+}
+
+#search_text {
+	width: 83.8%;
+	padding: 15px 0 15px 20px;
+	transition: all 0.15s;
+	font-size: 16px;
+	font-family: Montserrat, sans-serif;
+	border: 0 none;
+	height: 52px;
+	margin-right: 0;
+	color: white;
+	outline: none;
+	background: #1f7f5c;
+	float: left;
+	box-sizing: border-box;
+}
+
+::-webkit-input-placeholder { /* WebKit browsers */
+	color: white;
+}
+
+:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+	color: white;
+}
+
+::-moz-placeholder { /* Mozilla Firefox 19+ */
+	color: white;
+}
+
+:-ms-input-placeholder { /* Internet Explorer 10+ */
+	color: white;
+}
+
+#search_text:focus {
+	background: rgb(64, 151, 119);
+}
+
+#search_button {
+	border: 0 none;
+	background: #1f7f5c;
+	width: 13.8%;
+	float: left;
+	padding: 0;
+	text-align: center;
+	height: 52px;
+	cursor: pointer;
+}
+
+.radial-menu {
+	top: 15px;
+	left: 30%;
+	position: fixed;
+	display: block;
+	width: 100px;
+	height: 100px;
+	background-color: transparent;
+	border-radius: 50%;
+	z-index: 9999;
+	-webkit-box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.75);
+	-moz-box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.75);
+	box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.75);
+}
+
+.menu-item1 {
+	width: 60%;
+	height: 60%;
+	background-color: dimGray;
+	border-radius: 50%;
+	position: absolute;
+	color: white;
+	text-align: center;
+	line-height: 70px;
+	top: 25%;
+	left: 25%;
+	z-index: 19;
+	transition: all 500ms cubic-bezier(0.680, -0.550, 0.265, 1.550);
+	position: absolute;
+}
+
+.menu-item2 {
+	width: 60%;
+	height: 60%;
+	background-color: dimGray;
+	border-radius: 50%;
+	position: absolute;
+	color: white;
+	text-align: center;
+	line-height: 70px;
+	top: 25%;
+	left: 25%;
+	z-index: 19;
+	transition: all 500ms cubic-bezier(0.680, -0.550, 0.265, 1.550) .2s;
+}
+
+.menu-item3 {
+	width: 60%;
+	height: 60%;
+	background-color: dimGray;
+	border-radius: 50%;
+	position: absolute;
+	color: white;
+	text-align: center;
+	line-height: 70px;
+	top: 25%;
+	left: 25%;
+	transition: all 500ms cubic-bezier(0.680, -0.550, 0.265, 1.550) .4s;
+}
+
+.menu-item4 {
+	width: 60%;
+	height: 60%;
+	background-color: dimGray;
+	border-radius: 50%;
+	position: absolute;
+	color: white;
+	text-align: center;
+	line-height: 70px;
+	top: 25%;
+	left: 25%;
+	transition: all 500ms cubic-bezier(0.680, -0.550, 0.265, 1.550) .6s;
+}
+
+.mask {
+	top: 15px;
+	left: 30%;
+	width: 100px;
+	height: 100px;
+	background: darkSlateGray;
+	border-radius: 50%;
+	position: absolute;
+	z-index: 21;
+	color: white;
+	text-align: center;
+	line-height: 120px;
+	cursor: pointer;
+	position: fixed;
+}
+
+.rowh {
+	font-size: 32px;
+	float: left;
+}
+
+.rowp {
+	float: left;
+	font-size: 20px;
+}
+
+.rowd {
+	margin-left: 10%;
+	float: left;
+	text-align: justify;
+	font-weight: bold;
+	font-size: 18px;
+}
+
+.rowe {
+	margin-left: 10%;
+	float: left;
+	font-size: 20px;
+}
+</style>
+<script>
+	$(document)
+			.ready(
+					function() {
+						var height = $(document).height(), width = $(document)
+								.width(), tenPerHeight = height * 0.1, currentTab = 'menu-item1';
+						var active1 = false;
+						var active2 = false;
+						var active3 = false;
+						var active4 = false;
+
+						$('.radial-menu').on('click', function() {
+							if (!active1) {
+								$(this).find('.menu-item1').css({
+									'background-color' : 'gray',
+									'transform' : 'translate(0px,125px)'
+								});
+							} else {
+								$(this).find('.menu-item1').css({
+									'background-color' : 'dimGray',
+									'transform' : 'none'
+								});
+							}
+							if (!active2) {
+								$(this).find('.menu-item2').css({
+									'background-color' : 'gray',
+									'transform' : 'translate(60px,105px)'
+								});
+
+							} else {
+								$(this).find('.menu-item2').css({
+									'background-color' : 'darkGray',
+									'transform' : 'none'
+								});
+							}
+							if (!active3) {
+								$(this).find('.menu-item3').css({
+									'background-color' : 'gray',
+									'transform' : 'translate(105px,60px)'
+								});
+
+							} else {
+								$(this).find('.menu-item3').css({
+									'background-color' : 'silver',
+									'transform' : 'none'
+								});
+							}
+							if (!active4) {
+								$(this).find('.menu-item4').css({
+									'background-color' : 'gray',
+									'transform' : 'translate(125px,0px)'
+								});
+
+							} else {
+								$(this).find('.menu-item4').css({
+									'background-color' : 'silver',
+									'transform' : 'none'
+								});
+							}
+							active1 = !active1;
+							active2 = !active2;
+							active3 = !active3;
+							active4 = !active4;
+						});
+						$("#searchDiv").attr("style",
+								"height: " + tenPerHeight * 2 + "px");
+						$("#mapid").attr(
+								"style",
+								"height: " + tenPerHeight * 7.5 + "px;width: "
+										+ width * 0.97 + "px;");
+
+						$("#dicDiv")
+								.attr(
+										"style",
+										"height: " + tenPerHeight * 7.5
+												+ "px;width: " + width * 0.97
+												+ "px;position:relative");
+
+						$("#dicDiv").hide();
+
+						var availableTags = [ 'Home in Tirupati',
+								'Home in Chennai', 'Home in Hyderabad',
+								'Office in Chennai', 'Agra', 'Ahmedabad',
+								'Bangalore', 'Bhopal', 'Chennai', 'Coimbatore',
+								'Delhi', 'Ghaziabad', 'Hyderabad', 'Indore',
+								'Jaipur', 'Kanpur', 'Kolkata', 'Lucknow',
+								'Ludhiana', 'Madurai', 'Mumbai', 'Nagpur',
+								'Patna', 'Pimpri', 'Pune', 'Surat', 'Thane',
+								'Vadodara', 'Visakhapatnam', 'Nashik',
+								'Faridabad', 'Meerut', 'Rajkot', 'Varanasi',
+								'Srinagar', 'Aurangabad', 'Dhanbad',
+								'Amritsar', 'NaviMumbai', 'Allahabad',
+								'Ranchi', 'Howrah', 'Jabalpur', 'Gwalior',
+								'Vijayawada', 'Jodhpur', 'Raipur', 'Kota[21]',
+								'Guwahati', 'Chandigarh', 'Bareilly',
+								'Moradabad', 'Mysore', 'Tiruppur', 'Gurgaon',
+								'Aligarh', 'Jalandhar', 'Bhubaneswar', 'Salem',
+								'Warangal', 'Guntur', 'Bhiwandi', 'Saharanpur',
+								'Gorakhpur', 'Bikaner', 'Amravati', 'Noida',
+								'Jamshedpur', 'Bhilai', 'Cuttack', 'Firozabad',
+								'Kochi', 'Thiruvananthapuram', 'Solapur',
+								'Tiruchirappalli', 'Hubballi', 'Nellore',
+								'Bhavnagar', 'Dehradun', 'Durgapur', 'Asansol',
+								'Rourkela', 'Nanded', 'Kolhapur', 'Ajmer',
+								'Akola', 'Gulbarga', 'Jamnagar', 'Ujjain',
+								'Loni', 'Siliguri', 'Jhansi', 'Ulhasnagar',
+								'Jammu', 'Kupwad', 'Mangalore', 'Erode',
+								'Belgaum', 'Ambattur', 'Tirunelveli',
+								'Malegaon', 'Gaya', 'Jalgaon', 'Udaipur',
+								'Maheshtala', 'Davanagere', 'Kozhikode',
+								'Kurnool', 'Rajpur', 'Rajahmundry', 'Bokaro',
+								'Bellary', 'Patiala', 'Gopalpur', 'Agartala',
+								'Bhagalpur', 'Muzaffarnagar', 'Bhatpara',
+								'Panihati', 'Latur', 'Dhule', 'Tirupati',
+								'Rohtak', 'Korba', 'Bhilwara', 'Berhampur',
+								'Muzaffarpur', 'Ahmednagar', 'Mathura',
+								'Kollam', 'Avadi', 'Kadapa', 'Kamarhati',
+								'Sambalpur', 'Bilaspur', 'Shahjahanpur',
+								'Satara', 'Bijapur', 'Rampur', 'Shivamogga',
+								'Chandrapur', 'Junagadh', 'Thrissur', 'Alwar',
+								'Bardhaman', 'Kulti', 'Kakinada', 'Nizamabad',
+								'Parbhani', 'Tumkur', 'Khammam', 'Ozhukarai',
+								'BiharSharif', 'Panipat', 'Darbhanga', 'Bally',
+								'Aizawl', 'Dewas', 'Ichalkaranji', 'Karnal',
+								'Bathinda', 'Jalna', 'Eluru', 'Barasat',
+								'Purnia', 'Satna', 'Mau', 'Sonipat',
+								'Farrukhabad', 'Sagar', 'Rourkela', 'Durg',
+								'Imphal', 'Ratlam', 'Anantapur', 'Puducherry',
+								'Ramagundam', 'Vijayanagaram', 'Nagarcoil',
+								'Thanjavur', 'Secunderabad', 'Ongole',
+								'Nandyal', 'Chittoor[', 'Miryalaguda',
+								'Adilabad', 'Amaravati' ];
+
+						$("#search_text").autocomplete({
+							source : availableTags
+						});
+
+						var mymap = L.map('mapid')
+								.setView([ 13.62, 79.41 ], 13);
+						var tilesServer = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+						var defaultMaxZoom = 17;
+						var defaultMinZoom = 10;
+						var mapAttribution = '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors';
+
+						L.tileLayer(tilesServer, {
+							attribution : mapAttribution
+						}).addTo(mymap);
+
+						$(".leaflet-control-attribution").hide();
+
+						var locationMarker = null, geocoder = null;
+						var shouldShowLocationError = false;
+						var popup = L.popup();
+
+						function onMapClick(e) {
+							var msg = '';
+							var latlng = new google.maps.LatLng(e.latlng.lat,
+									e.latlng.lng);
+							if (!geocoder) {
+								geocoder = new google.maps.Geocoder();
+							}
+							geocoder.geocode({
+								'latLng' : latlng
+							}, function(results, status) {
+								if (status == google.maps.GeocoderStatus.OK) {
+									console.log(results)
+									if (results[1]) {
+										msg = results[0].formatted_address;
+									} else {
+										msg = "No results found";
+									}
+								} else {
+									msg = "Geocoder failed due to: " + status;
+								}
+								popup.setLatLng(e.latlng).setContent(
+										"You clicked the map at \"" + msg
+												+ "\"").openOn(mymap);
+							});
+						}
+
+						var icon = L.Icon.extend({
+							options : {
+								shadowUrl : ' ',
+								iconSize : [ 38, 38 ],
+								shadowSize : [ 0, 0 ],
+								iconAnchor : [ 0, 0 ],
+								shadowAnchor : [ 0, 0 ],
+								popupAnchor : [ 0, 0 ]
+							}
+						});
+
+						var homeIcon = new icon(
+								{
+									iconUrl : 'http://icons.iconarchive.com/icons/everaldo/desktoon/256/Home-icon.png'
+								});
+
+						var officeIcon = new icon(
+								{
+									iconUrl : 'https://upload.wikimedia.org/wikipedia/commons/e/e4/ICON_Office_Building.png'
+								});
+
+						mymap.on('click', onMapClick);
+
+						function createMarker(name, lat, lon, msg,
+								isMapsNeedsToBeShown) {
+							var markerName = "marker" + name;
+							if (isMapsNeedsToBeShown == "Home") {
+								markerName = L.marker([ lat, lon ], {
+									icon : homeIcon
+								}).addTo(mymap);
+							} else if (isMapsNeedsToBeShown == "Office") {
+								markerName = L.marker([ lat, lon ], {
+									icon : officeIcon
+								}).addTo(mymap);
+							}
+
+							if (isMapsNeedsToBeShown) {
+								msg = msg
+										+ '<a target="_blank" href="https://maps.google.com/maps?q='
+										+ lat + ',' + lon + '">Maps</a>'
+							}
+							markerName.bindPopup(msg);
+						}
+
+						createMarker("TptHome", 13.62142, 79.40219,
+								'Home in Tirupati. </br>', "Home");
+						createMarker("chnHome", 12.929164, 80.22814,
+								'Home in Chennai. </br>', "Home");
+						createMarker("hydHome", 17.34117, 78.56862,
+								'Home in Hyderabad. </br>', "Home");
+						createMarker("chnOffice", 12.91935, 80.22967,
+								'Office in Chennai. </br>', "Office");
+
+						updateDiv = function(e) {
+							if (currentTab != e.target.offsetParent.className) {
+								currentTab = e.target.offsetParent.className;
+								if (currentTab.indexOf("item1") >= 0) {
+									$("#dicDiv").hide();
+									$("#mapid").show();
+									$("#textSpan").text("Maps");
+								} else if (currentTab.indexOf("item2") >= 0) {
+									$("#dicDiv").show();
+									$("#mapid").hide();
+									$("#textSpan").text("Dictionary");
+									$("#dicDiv").attr(
+											"style",
+											"height: " + tenPerHeight * 7.5
+													+ "px;width: " + width
+													* 0.97
+													+ "px;position:relative");
+								} else if (currentTab.indexOf("item3") >= 0) {
+									$("#dicDiv").hide();
+									$("#mapid").hide();
+									$("#textSpan").text(" ");
+								} else {
+									$("#dicDiv").hide();
+									$("#mapid").hide();
+									$("#textSpan").text(" ");
+								}
+							}
+						}
+
+						$('#search_text').keypress(function(e) {
+							var key = e.which;
+							if (key == 13) {
+								loadRequiredData();
+							}
+						});
+
+						function createDictionaryTable(id, aptAfter, values,
+								label, note) {
+							var startHtml = '<div class="divTable"><table class="tableCls" id="'
+									+ id + '">';
+							var endHtml = '</table></div>';
+							var html = '';
+							for (var i = 0; i < values.length; i++) {
+								var curValue = values[i];
+								for (var j = 0; j < curValue.length; j++) {
+									if (j == 0) {
+										html = html + '<tr ><td class="rowh">'
+												+ curValue[j] + '</td></tr>';
+									} else if (j == 1) {
+										html = html + '<tr ><td class="rowp">'
+												+ curValue[j] + '</td></tr>';
+									} else if (j == 2) {
+										var tempData = curValue[j].split("&:&"), count = 1, tempHtml = "";
+										for (var z = 0; z < tempData.length - 1; z++) {
+											tempHtml = tempHtml + count + ") "
+													+ tempData[z] + "</br>";
+											count++;
+										}
+										html = html + '<tr ><td class="rowd">'
+												+ tempHtml + '</td></tr>';
+									} else if (j == 3) {
+										var tempData = curValue[j].split("&:&"), count = 1, tempHtml = "";
+										for (var z = 0; z < tempData.length - 1; z++) {
+											tempHtml = tempHtml + count + ") "
+													+ tempData[z] + "</br>";
+											count++;
+										}
+										html = html
+												+ '<tr ><td class="rowe">E.g: '
+												+ tempHtml + '</td></tr>';
+									}
+								}
+							}
+							$(aptAfter).empty();
+							if (label != "") {
+								$(aptAfter).append("<h3>" + label + "</h3>");
+							}
+							if (values.length > 0) {
+								console.log(startHtml + html + endHtml);
+								$(aptAfter).append(startHtml + html + endHtml);
+							}
+							if (note) {
+								$(aptAfter).append("</br>" + note);
+							}
+							$.unblockUI();
+						}
+
+						function invokeDictionaryService(word) {
+							$.blockUI();
+							$
+									.ajax({
+										url : 'http://api.pearson.com/v2/dictionaries/entries?headword='
+												+ word,
+										type : 'GET',
+										dataType : 'json',
+										success : function(data) {
+											if (data.results.length > 0) {
+												var groups = Object
+														.create(null);
+												var tableData = [];
+												for (var i = 0; i < data.results.length; i++) {
+													var item = data.results[i];
+
+													if (!groups[item.headword]) {
+														groups[item.headword] = [];
+													}
+													var datapush = "POS&_&"
+															+ item.part_of_speech
+															+ "&:&";
+
+													if (item.senses
+															&& item.senses[0]
+															&& item.senses[0].definition) {
+														datapush = datapush
+																+ "DESC&_&"
+																+ item.senses[0].definition
+																+ "&:&";
+
+														if (item.senses[0].examples
+																&& item.senses[0].examples[0]) {
+															datapush = datapush
+																	+ "EG&_&"
+																	+ item.senses[0].examples[0].text
+																	+ item.senses[0].definition;
+														}
+														groups[item.headword]
+																.push({
+																	data : datapush
+																});
+													}
+												}
+
+												var pos = [ 'VERB', 'NOUN',
+														'ADJECTIVE', 'ADVERB',
+														'PRONOUN',
+														'PREPOSITION',
+														'CONJUNCTION',
+														'INTERJUNCTION' ];
+
+												var obj = [], tableData = [], tempData = [], description = " ", example = " ", results = [];
+												$
+														.each(
+																groups,
+																function(key,
+																		value) {
+																			obj = [],
+																			tempData = [],
+																			description = " ",
+																			example = " ",
+																			results = [],
+																			tableObj = [];
+																	groupss = Object
+																			.create(null);
+																	for (var i = 0; i < value.length; i++) {
+																		var curVal = value[i];
+																		var tempData = curVal.data
+																				.split("&:&");
+																		var name = "";
+																		for (var z = 0; z < tempData.length; z++) {
+																			var curTempData = tempData[z]
+																					.split("&_&");
+
+																			if (z == 0) {
+																				name = curTempData[1];
+																				if ($
+																						.inArray(
+																								(curTempData[1])
+																										.toUpperCase(),
+																								pos) >= 0) {
+																					if (!groupss[name]) {
+																						groupss[name] = [];
+																					}
+																				}
+																			} else if (z == 1) {
+																				if (curTempData[1]) {
+																					groupss[name]
+																							.push({
+																								description : curTempData[1]
+																							});
+																				}
+																			} else if (z == 2) {
+																				if (curTempData[1]) {
+																					groupss[name]
+																							.push({
+																								example : curTempData[1]
+																							});
+																				}
+																			}
+																		}
+																	}
+
+																	$
+																			.each(
+																					groupss,
+																					function(
+																							keys,
+																							values) {
+																						tableObj = [];
+																						tableObj
+																								.push(key);
+																						tableObj
+																								.push(keys);
+
+																						for (var r = 0; r < values.length; r++) {
+																							var curVals = values[r];
+																							if (curVals
+																									&& curVals.description) {
+																								description = description
+																										+ curVals.description
+																										+ "&:&";
+																							}
+																							if (curVals
+																									&& curVals.example) {
+																								example = example
+																										+ curVals.example
+																										+ "&:&";
+																							}
+
+																							if (r == values.length - 1) {
+																								if (description
+																										&& description
+																												.trim().length > 0) {
+																									tableObj
+																											.push(description);
+																								}
+																								if (example
+																										&& example
+																												.trim().length > 0) {
+																									tableObj
+																											.push(example);
+																								}
+																										description = " ",
+																										example = " ";
+																								tableData
+																										.push(tableObj);
+																							}
+																						}
+																					});
+																});
+
+												createDictionaryTable(
+														"dicTable",
+														"#dicResultsDiv",
+														tableData, "", "");
+											} else {
+												$.unblockUI();
+												$("#dicResultsDiv").text(
+														"NO Results Found.");
+											}
+										},
+										error : function(request, error) {
+											$.unblockUI();
+											$("#dicResultsDiv").text(
+													"Error in Getting Data.");
+										}
+									});
+						}
+
+						locateMeButton = function() {
+							shouldShowLocationError = true;
+							mymap.locate({
+								setView : true
+							});
+							mymap
+									.on(
+											'locationfound',
+											function(e) {
+												shouldShowLocationError = false;
+												if (!locationMarker) {
+													var iconOptions = {
+														iconUrl : 'https://sydneypogomap.com/images/your_location.png',
+														iconAnchor : [ 12, 25 ],
+														iconSize : [ 25, 25 ],
+														zIndexOffset : 1000
+													}
+													locationMarker = L
+															.marker(
+																	e.latlng,
+																	{
+																		icon : L
+																				.icon(iconOptions)
+																	});
+													locationMarker.addTo(mymap);
+												} else {
+													locationMarker
+															.setLatLng(e.latlng);
+												}
+											});
+							mymap
+									.on(
+											'locationerror',
+											function(e) {
+												if (shouldShowLocationError) {
+													alert("You need to allow your browser (Safari/Chrome/etc) to have location access. It's usually in Settings.");
+													shouldShowLocationError = false;
+												}
+											});
+						}
+
+						loadRequiredData = function() {
+							if (currentTab == "menu-item1") {
+								var address = $("#search_text").val();
+								address = address || 'Tirupati';
+								getLatitudeLongitude(address);
+							} else if (currentTab == "menu-item2") {
+								var word = $("#search_text").val();
+								word = word || 'Dictonary';
+								invokeDictionaryService(word);
+							}
+						}
+
+						function getLatitudeLongitude(address) {
+							geocoder = new google.maps.Geocoder();
+							if (geocoder) {
+								geocoder
+										.geocode(
+												{
+													'address' : address
+												},
+												function(results, status) {
+													if (status == google.maps.GeocoderStatus.OK) {
+														showResult(results[0]);
+													}
+												});
+							}
+						}
+
+						function showResult(result) {
+							if (!locationMarker) {
+								var iconOptions = {
+									iconUrl : 'https://sydneypogomap.com/images/your_location.png',
+									iconAnchor : [ 12, 25 ],
+									iconSize : [ 25, 25 ],
+									zIndexOffset : 1000
+								}
+								locationMarker = L.marker([
+										result.geometry.location.lat(),
+										result.geometry.location.lng() ], {
+									icon : L.icon(iconOptions)
+								});
+								mymap.panTo({
+									lat : result.geometry.location.lat(),
+									lng : result.geometry.location.lng()
+								});
+								locationMarker.addTo(mymap);
+							} else {
+								locationMarker.setLatLng({
+									lat : result.geometry.location.lat(),
+									lng : result.geometry.location.lng()
+								});
+								mymap.panTo({
+									lat : result.geometry.location.lat(),
+									lng : result.geometry.location.lng()
+								});
+							}
+						}
+					});
+</script>
+
+</head>
+<body style="height: 97%; width: 97%;">
+	<!-- 	<div style="height: 100%; width: 100%; background: red"> -->
+	<div id="searchDiv" style="width: 100%">
+		<div id="proName">
+			<span id="textSpan" style="position: absolute; top: 5%; left: 5%;">
+				Maps</span>
+		</div>
+		<div id="search">
+			<input type="text" name="search_text" id="search_text"
+				placeholder="Search" /> <input id="search_button" type="image"
+				onclick="loadRequiredData(); $('#search_button').blur();"
+				src="http://www.corgoind.com/sites/default/files/images/search-icon.png">
+		</div>
+	</div>
+	<div id="dicDiv" style="width: 100%;">
+		<div id="dicResultsDiv"
+			style="overflow-y: scroll; overflow-x: hidden; height: 100%;"></div>
+	</div>
+	<div id="mapid" style="z-index: 9999; width: 100%;">
+		<div id="locate"
+			style="position: absolute; right: 10px; z-index: 10000; width: 50px; height: 50px;">
+			<input id="locate_input" type="image"
+				src="https://sydneypogomap.com/images/locate2.png"
+				style="width: 50px; height: 50px;"
+				onclick="locateMeButton(); $('#locate_input').blur();">
+		</div>
+	</div>
+	<!-- 	</div> -->
+	<div class="radial-menu">
+		<div class="menu-item1">
+			<i class="fa fa-map fa-2x" onclick="updateDiv(event)"></i>
+		</div>
+		<div class="menu-item2">
+			<i class="fa fa-graduation-cap fa-2x" onclick="updateDiv(event)"></i>
+		</div>
+		<div class="menu-item3">
+			<i class="fa fa-code fa-2x" onclick="updateDiv(event)"></i>
+		</div>
+		<div class="menu-item4">
+			<i class="fa fa-envelope-o fa-2x" onclick="updateDiv(event)"></i>
+		</div>
+		<div class="mask">
+			<i class="fa fa-home fa-3x"></i>
+		</div>
+	</div>
+</body>
+</html>
