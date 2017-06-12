@@ -1,0 +1,34 @@
+{
+	"name": "Map",
+	"version": "0.0.1",
+	"description": "Map Application",
+	"main": "server.js",
+	"dependencies": {
+		"chai": "^3.5.0",
+		"chai-http": "^2.0.1",
+		"ejs": "^2.4.1",
+		"express": "^4.13.4",
+		"mocha": "^2.4.5",
+		"mongodb": "^2.1.16",
+		"morgan": "^1.7.0",
+		"object-assign": "4.1.0",
+		"body-parser": "^1.17.1",
+		"bootstrap": "^3.3.7",
+		"express": "^4.15.2",
+		"mysql": "2.13.0"
+	},
+	"engine": {
+		"node": "*",
+		"npm": "*"
+	},
+	"scripts": {
+		"start": "node server.js"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/rysarath2009/Map.git"
+	},
+	"author": "Sarath Chandra <rysarath2009@gmail.com>",
+	"license": "ISC",
+	"homepage": "https://github.com/rysarath2009/Map"
+}
